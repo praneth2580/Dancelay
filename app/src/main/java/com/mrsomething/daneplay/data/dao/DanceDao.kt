@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.mrsomething.daneplay.data.entity.DanceDef
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DanceDao {
@@ -12,5 +13,5 @@ interface DanceDao {
     suspend fun insertDance(dance: DanceDef)
 
     @Query("SELECT * FROM dance_def ORDER BY name")
-    suspend fun getAllDances(): List<DanceDef>
+    fun getAllDances(): Flow<List<DanceDef>>
 }
