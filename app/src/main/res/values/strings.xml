@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Dancelay</string>
+    <string name="title_activity_music_list_screen">MusicListScreen</string>
+    <string name="title_activity_music_player">MusicPlayerActivity</string>
+</resources>
