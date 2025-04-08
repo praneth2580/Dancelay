@@ -21,6 +21,9 @@ class DanceViewModel(application: Application) : AndroidViewModel(application) {
             initialValue = emptyList()
         )
 
+    suspend fun getDance(dance_id: Int): DanceDef {
+        return dao.getDance(dance_id)
+    }
 
     fun addDance(name: String) {
         viewModelScope.launch {

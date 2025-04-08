@@ -16,7 +16,16 @@ interface MusicDanceMappingDao {
     @Query("SELECT * FROM music_dance_mapping ORDER BY `order`")
     suspend fun getAllMappings(): List<MusicDanceMapping>
 
+    @Query("SELECT * FROM music_dance_mapping where dance_id = :dance_id ORDER BY `order`")
+    suspend fun getMusicByDanceId(dance_id: Int): List<MusicDanceMapping>
+
+    @Query("SELECT count(music_dance_mapping_id) FROM music_dance_mapping where dance_id = :dance_id ORDER BY `order`")
+    suspend fun getMusicNextOrder(dance_id: Int): Int
+
     @Transaction
     @Query("SELECT * FROM music_dance_mapping")
     suspend fun getMappingsWithDance(): List<MappingWithDance>
+
+    @Query("DELETE FROM music_dance_mapping WHERE dance_id = :danceId")
+    suspend fun deleteByDanceId(danceId: Int)
 }

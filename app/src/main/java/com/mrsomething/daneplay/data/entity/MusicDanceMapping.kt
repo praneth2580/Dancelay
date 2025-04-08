@@ -22,12 +22,12 @@ data class MusicDanceMapping(
     val name: String,
     val file_path: String,
     val order: Int,
-    val start_time: Long,
-    val start_transition_type: String,
-    val start_transition_duration: Long,
-    val end_time: Long,
-    val end_transition_type: String,
-    val end_transition_duration: Long,
+    val start_time: Long? = null,
+    val start_transition_type: String? = null,
+    val start_transition_duration: Long? = null,
+    val end_time: Long? = null,
+    val end_transition_type: String? = null,
+    val end_transition_duration: Long? = null,
     val dance_id: Int // 🔗 Foreign key to dance_def
 )
 

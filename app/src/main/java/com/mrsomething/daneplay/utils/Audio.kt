@@ -4,16 +4,21 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import com.mrsomething.daneplay.data.entity.DanceDef
+import com.mrsomething.daneplay.data.entity.MusicDanceMapping
+import com.mrsomething.daneplay.data.model.MusicDanceMappingViewModel
 
 data class AudioFile(
     val uri: Uri,
     val name: String,
+    var selected: Boolean = false,
     val albumArt: Uri? = null
 )
 
-fun getAudioFiles(context: Context): List<AudioFile> {
+suspend fun getAudioFiles(context: Context, dance: DanceDef? = null, viewModel: MusicDanceMappingViewModel? = null): List<AudioFile> {
     val audioList = mutableListOf<AudioFile>()
     val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    val mappedMusic = dance?.dance_id?.let { viewModel?.getMusicByDanceId(it) }
 
     val projection = arrayOf(
         MediaStore.Audio.Media._ID,
@@ -46,10 +51,45 @@ fun getAudioFiles(context: Context): List<AudioFile> {
                 albumId
             )
 
-            audioList.add(AudioFile(songUri, name, albumArtUri))
+            audioList.add(AudioFile(songUri, name, mappedMusic?.any { it.file_path == songUri.toString() } ?: false, albumArtUri))
         }
     }
 
     return audioList
 }
 
+fun getAudioFilesFromUris(context: Context, uriStrings: List<MusicDanceMapping>): List<AudioFile> {
+    val resolver = context.contentResolver
+    val audioFiles = mutableListOf<AudioFile>()
+
+    uriStrings.forEach { music_dance_mapping ->
+        val uri = Uri.parse(music_dance_mapping.file_path)
+
+        val projection = arrayOf(
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ALBUM_ID
+        )
+
+        resolver.query(uri, projection, null, null, null)?.use { cursor ->
+            val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val albumIdCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+
+            if (cursor.moveToFirst()) {
+                val title = cursor.getString(titleCol)
+                val albumId = cursor.getLong(albumIdCol)
+
+                val albumArtUri = Uri.parse("content://media/external/audio/albumart/$albumId")
+
+                audioFiles.add(
+                    AudioFile(
+                        name = title,
+                        uri = uri,
+                        albumArt = albumArtUri
+                    )
+                )
+            }
+        }
+    }
+
+    return audioFiles
+}

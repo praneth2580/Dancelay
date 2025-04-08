@@ -11,7 +11,7 @@ import com.mrsomething.daneplay.data.entity.MusicDanceMapping
 
 @Database(
     entities = [DanceDef::class, MusicDanceMapping::class],
-    version = 1
+    version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun danceDao(): DanceDao
@@ -26,7 +26,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build().also {
+                )
+                    .fallbackToDestructiveMigration()
+                    .build().also {
                     INSTANCE = it
                 }
             }
